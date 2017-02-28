@@ -263,3 +263,30 @@ mar feb 28 09:55:15 CET 2017 com.bs.opt.conciliador.process.CreateXLS crearSheet
 mar feb 28 09:55:15 CET 2017 com.bs.opt.conciliador.process.CreateXLS toXLS() INFORMACIÓN Volcamos la salida en un fichero excel: <C:\_OPTIMISSA_\PROYECTOS\04 Conciliador\PRUEBAS_XML\ResultConciliation.xls>
 mar feb 28 09:55:15 CET 2017 com.bs.opt.conciliador.process.CreateXLS toXLS() INFORMACIÓN <-- toXLS()
 mar feb 28 09:55:15 CET 2017 com.bs.opt.conciliador.main.Main2 main() INFORMACIÓN <-- FIN
+mar feb 28 17:34:36 CET 2017 com.bs.opt.conciliador.main.Main main() INFORMACIÓN --> INICIO
+mar feb 28 17:34:37 CET 2017 com.bs.opt.conciliador.xml.MapperXML getDataOperationsXML() INFORMACIÓN --> getDatosOperacionesXML()
+mar feb 28 17:34:38 CET 2017 com.bs.opt.conciliador.xml.MapperXML getDataOperationsXML() INFORMACIÓN Cargamos el fichero xml <src/main/resources/xml/request/AAAAAAA_YYYYMMDD_RC_010.xml> en memoria mediante jaxb a través de las clases generadas dinámicamente a partir de éste.
+mar feb 28 17:34:38 CET 2017 com.bs.opt.conciliador.xml.MapperXML getDataOperationsXML() INFORMACIÓN La fecha de creación que viene en el xml es correcta.
+mar feb 28 17:34:38 CET 2017 com.bs.opt.conciliador.xml.MapperXML getDataOperationsXML() INFORMACIÓN Hemos volcado las operaciones del xml a objetos java en memoria.
+mar feb 28 17:34:38 CET 2017 com.bs.opt.conciliador.xml.MapperXML getDataOperationsXML() INFORMACIÓN <-- getDatosOperacionesXML()
+mar feb 28 17:34:38 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getDataOperationsBD() INFORMACIÓN --> getDatosOperacionesBD()
+mar feb 28 17:34:38 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getDataOperationsBD() INFORMACIÓN query: <select * from BS_OPT_OPERACIONES_DERIVADOS where NUM_OPER in ( ?,?,?,? )>
+mar feb 28 17:34:38 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getConnectionBD() INFORMACIÓN --> getConexionBD()
+mar feb 28 17:34:41 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getConnectionBD() INFORMACIÓN Obtenida conexión.
+mar feb 28 17:34:41 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getConnectionBD() INFORMACIÓN <-- getConexionBD()
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getDataOperationsBD() INFORMACIÓN Mapeo de datos: BD -> VO
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getDataOperationsBD() INFORMACIÓN Proceso terminado ok. Número de mapeos de operaciones realizadas: <2>
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getDataOperationsBD() INFORMACIÓN Cerrada conexión con éxito.
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.bd.MapperDAO getDataOperationsBD() INFORMACIÓN <-- getDatosOperacionesBD()
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.ProcessOperations conciliation() INFORMACIÓN --> conciliation()
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.ProcessOperations conciliation() INFORMACIÓN La operación <100313000046> está conciliada respecto al xml y la bd: la añadimos a la lista de operaciones OK.
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.ProcessOperations conciliation() INFORMACIÓN La operación <100313000047> está conciliada respecto al xml y la bd: la añadimos a la lista de operaciones OK.
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.ProcessOperations conciliation() INFORMACIÓN La operación <12586622221> está en el xml pero NO en base de datos: la añadimos a la lista de operaciones KO.
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.ProcessOperations conciliation() INFORMACIÓN La operación <12586622220> está en el xml pero NO en base de datos: la añadimos a la lista de operaciones KO.
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.ProcessOperations conciliation() INFORMACIÓN <-- conciliation()
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.CreateXLS toXLS() INFORMACIÓN --> toXLS()
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.CreateXLS crearSheet() INFORMACIÓN Creada la hoja para las operaciones: <OK>
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.CreateXLS crearSheet() INFORMACIÓN Creada la hoja para las operaciones: <KO>
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.CreateXLS toXLS() INFORMACIÓN Volcamos la salida en un fichero excel: <C:\_OPTIMISSA_\PROYECTOS\04 Conciliador\PRUEBAS_XML\ResultConciliation.xls>
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.process.CreateXLS toXLS() INFORMACIÓN <-- toXLS()
+mar feb 28 17:34:42 CET 2017 com.bs.opt.conciliador.main.Main main() INFORMACIÓN <-- FIN

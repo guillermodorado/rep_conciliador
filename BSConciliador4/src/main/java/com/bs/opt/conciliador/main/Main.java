@@ -16,7 +16,7 @@ import com.bs.opt.conciliador.xml.MapperXML;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
-public class Main2 {
+public class Main {
 
 	private final static Logger LOGGER = Logger.getLogger("com.bs.opt.conciliador");
 	
