@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TramiteCNMV xsi:noNamespaceSchemaLocation="SINCO_Respuesta.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<DocumentoCNMV>
+		<CodigoTramite>CDT</CodigoTramite>
+		<Version>
+			<Datos>02.40</Datos>
+		</Version>
+	</DocumentoCNMV>
+	<TramiteCDT>
+		<TramiteCDT_RESESP FechaCreacion="2012-04-13" HoraCreacion="15:20:00">
+			<NombreFichero>AAAAAA_YYYYMMDD_TR_001.XML</NombreFichero>
+			<SinErrores>OK</SinErrores>
+		</TramiteCDT_RESESP>
+	</TramiteCDT>
+</TramiteCNMV>

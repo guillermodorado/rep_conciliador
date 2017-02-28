@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 sp1 (x64) (http://www.altova.com) by Maria Carmona (CNMV) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="TiposInfoErrores.xsd"/>
+	<xs:element name="TramiteCNMV">
+		<xs:annotation>
+			<xs:documentation>Envia a la ESI el resultado del procesamiento del fichero de transacciones.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="DocumentoCNMV" type="TipoDocumentoCNMV"/>
+				<xs:element name="TramiteCDT" type="TipoTramiteCDTDual"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--	
+******************************************************************************
+	INFO RESPUESTA
+
+	NombreFichero: nombre del fichero que se ha recibido. Su estructura 
+	es CCCCCCCCCCC_YYYYMMDD_TR_NNN.ZIP. Aunque en el XML Schema 
+    no se valida este formato de nombre. Descripción:
+		CCCCCCCCCCC - Codigo BIC de la ESI
+		YYYYMMDD - Fecha de creacion del fichero 
+		?? - tipo de fichero: TR- Fichero Diario de operaciones 
+			ó RC - Fichero especial de Remision Complementaria
+		NNN - secuencia diaria
+
+	SinErrores: informa que la recepción es correcta.
+
+	InfoErrores: informa de que ha habido errores en la recepción de la
+	información.
+
+Y dos atributos:
+	    FechaCreacion: del fichero xml.
+		HoraCreacion: del dichero xml.
+
+******************************************************************************
+-->
+	<xs:complexType name="TipoTramiteCDTDual">
+		<xs:choice>
+			<xs:element name="TramiteCDT_RESESP" type="TipoTramiteCDT_RESESP"/>
+			<xs:element name="TramiteCDT_FDBENG" type="TipoTramiteCDT_FDBENG"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="TipoTramiteCDT_RESESP">
+		<xs:sequence>
+			<xs:element name="NombreFichero" type="TipoNombreFichero"/>
+			<xs:choice>
+				<xs:element name="SinErrores" type="TipoSinErrores"/>
+				<xs:element name="InfoErrores" type="TipoInfoErrores"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="FechaCreacion" type="xs:date" use="required"/>
+		<xs:attribute name="HoraCreacion" type="xs:time" use="required"/>
+	</xs:complexType>
+	<!--	
+******************************************************************************
+	FEEDBACK INFO
+
+	FileName: name of the file recevied.
+
+	NoErrors: reception file and its content are correct.
+
+	ErrorsInfo: there have been errors in the file or in the transactions.
+
+	There are two attributes:
+		CreationDate: day when the XML file was created.
+		CreationTime: time when the XML file was created.
+
+******************************************************************************
+-->
+	<xs:complexType name="TipoTramiteCDT_FDBENG">
+		<xs:sequence>
+			<xs:element name="FileName" type="TipoNombreFichero"/>
+			<xs:choice>
+				<xs:element name="NoErrors" type="TipoSinErrores"/>
+				<xs:element name="ErrorsInfo" type="ErrorsInfoCompleteDescriptionType"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="CreationDate" type="xs:date" use="required"/>
+		<xs:attribute name="CreationTime" type="xs:time" use="required"/>
+	</xs:complexType>
+	<!--	
+************************************************************************
+	TIPOS COMPUESTOS
+
+	TipoInfoErrores: los errores pueden estar relacionados con 
+	el fichero o con el contenido de la operación.
+
+    TipoDocumentoCNMV: se compone del codigo del trámite y 
+	de la versión del esquema utilizado.
+
+************************************************************************
+-->
+	<xs:complexType name="TipoInfoErrores">
+		<xs:choice>
+			<xs:element name="ErrorFichero" type="TipoErrorFichero"/>
+			<xs:element name="ErroresOperacion" type="TipoErroresTransaccion"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="ErrorsInfoCompleteDescriptionType">
+		<xs:choice>
+			<xs:element name="FileError" type="FileErrorType"/>
+			<xs:element name="OperationErrors" type="TransactionErrorsCompleteDescriptionType"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="TipoDocumentoCNMV">
+		<xs:sequence>
+			<xs:element name="CodigoTramite" type="TipoTramiteCNMV"/>
+			<!-- 6/7/12 Cambia a etiqueta obligatoria -->
+			<xs:element name="Version" type="TipoVersion"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--	
+************************************************************************
+	TIPOS SIMPLES
+
+	TipoTramiteCNMV: Tipo CDT
+
+	TipoNumeroVersion: nn.nn.nn
+
+	TipoSinErrores: OK indica que no ha habido errores.
+
+	TipoNombreFichero: No se realiza ningun tipo de validacion
+	en el nombre del fichero
+
+************************************************************************
+-->
+	<xs:simpleType name="TipoTramiteCNMV">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="CDT"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TipoVersion">
+		<xs:sequence>
+			<xs:element name="Datos" type="TipoNumeroVersion"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- 6/7/12 Nueva version-->
+	<xs:simpleType name="TipoNumeroVersion">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="02.40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoSinErrores">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="OK"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoNombreFichero">
+		<xs:annotation>
+			<xs:documentation>No se realiza ningun tipo de validacion en el nombre del fichero  </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

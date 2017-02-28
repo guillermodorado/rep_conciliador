@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!--	
+************************************************************************************************
+	TIPOS COMPLEJOS
+
+TipoHoraDeNegociacion: compuesto por la hora y el identificador horario (+01/+02). 
+
+TipoPrecioUnitario: distingue entre precio expresado en divisa o en porcentaje, pero 
+al menos tiene que haber uno de los dos.
+
+TipoIdClientes: describe la información de uno o varios clientes.
+
+TipoInformacionCliente: en un mismo cliente/cuenta de valores pueden alternarse 
+como titulares personas físicas y jurídicas, mínimo uno de ellas, pero solo habrá 
+una cantidad por cliente/cuenta de valores.
+
+TipoPersonaFisica: describe las caracteristicas de una persona física, incluido el
+representante si se trata de un menor de edad.
+
+TipoRepresentante: describe las caracteristicas del representante de la persona 
+física menor de edad.
+
+TipoPersonaJuridica: describe las caracteristicas de una persona jurídica.
+
+TipoContrapartida: existen tres tipos de códigos que definen la contrapartida, se
+trata de seleccionar uno de ellos: BIC, MIC  o código interno.
+
+TipoSistemaNegociacion: existen tres tipos de códigos que definen el sistema de 
+negociación, se trata de seleccionar uno de ellos: BIC, MIC o codigo XOFF.
+
+*************************************************************************************************
+-->
+	<xs:complexType name="TipoHoraDeNegociacion">
+		<xs:sequence>
+			<xs:element name="HoraNegociacion" type="xs:time"/>
+			<xs:element name="IdentificadorHorario" type="TipoIdentificadorHorario"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoPrecioUnitario">
+		<xs:choice>
+			<xs:element name="PrecioDivisa" type="TipoPrecio"/>
+			<xs:element name="PrecioPorcentaje" type="TipoPrecio"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="TipoPrecio">
+		<xs:annotation>
+			<xs:documentation>Formato: Max 19(d) y max 5 cifras decimales. No admite negativos. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="19"/>
+			<xs:fractionDigits value="5"/>
+			<xs:minExclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TipoIdClientes">
+		<xs:sequence>
+			<xs:element name="InformacionCliente" type="TipoInformacionCliente" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoInformacionCliente">
+		<xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="PersonaFisica" type="TipoPersonaFisica"/>
+				<xs:element name="PersonaJuridica" type="TipoPersonaJuridica"/>
+			</xs:choice>
+			<xs:element name="CantidadCliente" type="TipoCantidad"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoPersonaFisica">
+		<xs:sequence>
+			<xs:element name="TipoIdentificador" type="TipoIdClientePF"/>
+			<xs:element name="CodigoIdentificadorTitular" type="TipoCodigoClienteoRepresentante"/>
+			<xs:element name="Nombre" type="TipoNombreoRazonSocial"/>
+			<xs:element name="Apellido1" type="TipoApellido"/>
+			<xs:element name="Apellido2" type="TipoApellido" minOccurs="0"/>
+			<xs:element name="Representante" type="TipoRepresentante" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoRepresentante">
+		<xs:sequence>
+			<xs:element name="TipoRepresentante" type="TipoIdClientePF"/>
+			<xs:element name="CodigoRepresentante" type="TipoCodigoClienteoRepresentante"/>
+			<xs:element name="NombreRepresentante" type="TipoNombreoRazonSocial"/>
+			<xs:element name="Apellido1Representante" type="TipoApellido"/>
+			<xs:element name="Apellido2Representante" type="TipoApellido" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoPersonaJuridica">
+		<xs:sequence>
+			<xs:element name="TipoIdentificador" type="TipoIdClientePJ"/>
+			<xs:element name="CodigoIdentificadorTitular" type="TipoCodigoClienteoRepresentante"/>
+			<xs:element name="RazonSocial" type="TipoNombreoRazonSocial"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoContrapartida">
+		<xs:choice>
+			<xs:element name="ContrapartidaBIC" type="TipoIdentificadorESI"/>
+			<xs:element name="ContrapartidaMIC" type="TipoMIC"/>
+			<xs:element name="ContrapartidaCliente" type="TipoCodigoInterno"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="TipoSistemaNegociacion">
+		<xs:choice>
+			<xs:element name="SistemaNegociacionBIC" type="TipoIdentificadorESI"/>
+			<xs:element name="SistemaNegociacionMIC" type="TipoMIC"/>
+			<xs:element name="SistemaNegociacionXOFF" type="TipoXOFF"/>
+		</xs:choice>
+	</xs:complexType>
+	<!--	
+************************************************************************
+	TIPOS SIMPLES
+
+	TipoTramiteCNMV: Tipo CDT
+
+	TipoNumeroVersion: nn.nn
+	
+	TipoIdentificadorESI: ISO 9362 - SWIFT/Bank Identifier Code (BIC). 
+	Formato: 11(x)
+
+    TipoSesionNeg: no son validas operaciones anteriores al 1/11/2007.
+
+	TipoIdentificadorHorario: Formato SHH: +/- horas.
+
+	TipoIndicadorCompraVenta: identificador de la transacción. 
+	Formato: 1(a) - B: Buy  para compra y S: Sell para venta.
+
+	TipoCapacidadNegociacion: indica como se ha realizado la transacción, 
+	Formato: 1(a) - P: Cuenta Propia, A: Por cuenta o en nombre de un 
+	tercero (Ajena).
+
+	ISIN:  ISO 6166 International Securities Identification Number. 
+	Formato:  2(a)9(x)1(n) 
+
+	TipoPrecio: Formato: Max 19(d) y max 5 cifras decimales. No admite
+	cantidades negativas.
+
+	TipoDivisa: ISO 4217 - Codigo de divisa. Formato: 3(a)
+
+	TipoCantidad: Formato: Max 19(d) y max 5 cifras decimales. No admite
+	cantidades negativas.
+
+    TipoNotacionCantidad: U = Unidades negociadas 
+		N = Valor Nominal en caso de obligaciones  
+		D = Número de contratos de derivados.
+
+	TipoCodigoInterno: CLIENTE FINAL
+
+	TipoMIC: ISO 10383 MIC - Formato: 4(x)
+
+	TipoXOFF: XOFF: Off the Market o XXXX
+
+	TipoIdentificadorOperacion: facilitado por la empresa de inversión o 
+	un tercero que informa en su nombre - Formato: Max17(x)
+
+	TipoCancelacion: indica si la transacción ha sido anulada. Formato: S
+
+	TipoIdClientePF : tipos de código cliente para persona física (N (NIF), E (NIE) u O (Otro))
+
+	TipoIdClientePJ: tipos de código cliente para persona jurídica (C (CIF), B (BIC) u O (Otro))
+
+	TipoCodigoClienteoRepresentante: Identificación del código de cliente. Formato 40x
+
+	TipoNombreoRazonSocial: nombre de la persona física o razón social de la 
+	persona jurídica. Formato: 60x (minimo 1 caracter)
+
+	TipoApellido: apellido de la persona física. Formato: 40x.
+
+*************************************************************************************
+-->
+	<xs:simpleType name="TipoTramiteCNMV">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="CDT"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TipoVersion">
+		<xs:sequence>
+			<xs:element name="Datos" type="TipoNumeroVersion"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- Nuevo en version 2.4 -->
+	<xs:simpleType name="TipoNumeroVersion">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="02.40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- Nuevo en version 2.4 -->
+	<xs:simpleType name="TipoClaseIdentificadorESI">
+		<xs:annotation>
+			<xs:documentation>
+			B: Bic
+				</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:whiteSpace value="collapse"/>
+			<xs:minLength value="1"/>
+			<xs:pattern value="B"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- Nuevo en version 2.4-->
+	<xs:simpleType name="TipoIdentificadorESI">
+		<xs:annotation>
+			<xs:documentation>ISO 9362 - SWIFT/Bank Identifier Code (BIC). Formato: 11(x)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="[A-Z|0-9]{11}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+		<!-- Nuevo en version 2.4-->
+	<xs:simpleType name="TipoSesionNeg">
+		<xs:restriction base="xs:date">
+			<xs:minInclusive value="2007-11-01"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoIdentificadorHorario">
+		<xs:annotation>
+			<xs:documentation>ISO 8601 Time Zone Offset Format:SHH max 12 h</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="[-|+](0[0-9]|1[0-2])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoIndicadorCompraVenta">
+		<xs:annotation>
+			<xs:documentation>
+			B: Buy  
+			S: Sell
+				</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="B|S"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoCapacidadNegociacion">
+		<xs:annotation>
+			<xs:documentation>
+			P: Principal
+			A: Agent
+				</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="P|A"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoCodigoInstrumentoISIN">
+		<xs:annotation>
+			<xs:documentation> ISO 6166 ISIN.  Formato:  2(a)9(x)1(n) </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="[A-Z]{2}([A-Z]|[0-9]){9}[0-9]"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoDivisa">
+		<xs:annotation>
+			<xs:documentation>ISO 4217 - Codigo de divisa </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="[A-Z]{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoCantidad">
+		<xs:annotation>
+			<xs:documentation>Formato: Max 19(d) y max of 5 cifras decimales. No admite negativos.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="19"/>
+			<xs:fractionDigits value="5"/>
+			<xs:minExclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoNotacionCantidad">
+		<xs:annotation>
+			<xs:documentation>Formato: U = Unidades negociadas N = Valor Nominal en caso de obligaciones  D = Número de contratos de derivados.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="U|N|D"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoCodigoInterno">
+		<xs:restriction base="xs:token">
+			<xs:pattern value="CLIENTE FINAL"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoMIC">
+		<xs:annotation>
+			<xs:documentation> ISO 10383 MIC - Formato: 4(x) </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="[A-Z|0-9]{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoXOFF">
+		<xs:annotation>
+			<xs:documentation>XOFF: Off the Market o XXXX para MIC XOFF</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="XOFF|XXXX"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoIdentificadorOperacion">
+		<xs:annotation>
+			<xs:documentation>Facilitado por la empresa de inversión o un tercero que informa en su nombre. - Formato: Max17(x)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="17"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+		<!-- Se quita el patron de letras y numeros -->
+	</xs:simpleType>
+	<xs:simpleType name="TipoCancelacion">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="S"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoIdClientePF">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="N|E|O"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoIdClientePJ">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="C|B|O"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoCodigoClienteoRepresentante">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="40"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoNombreoRazonSocial">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="60"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoApellido">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="40"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--	
+
+************************************************************************
+	COMPLEX TYPES 
+
+	TradingTimeCompleteDescriptionType: The time at which the 
+	transaction was executed. Also, the base in which the transaction 
+    is reported (+/-hours).
+
+	UnitPriceCompleteDescriptionType: The price per security or derivative 
+	contract excluding commission and (where relevant) accrued interest. 
+	In the case of a debt instrument, the price may be expressed either in 
+	terms of a currency or as a percentage.
+
+	ClientIdCompleteDescriptionType: The element can be one or more individuals 
+	or legal entities or both.
+
+	ClientInformationType: there could be either individual or legal entities, at least 
+	one of them. There is just one quantity for each client.
+	
+	IndividualType: describes the main characteristics of an individual, including the
+	legal representative if the individual is under 18.
+
+	LegalRepresentativeType: describes the main characteristics of a legal 
+	representative if the individual is under 18.
+
+	LegalEntityType: describes the main characteristics of a legal entity type.
+
+	CounterpartyCompleteDescriptionType: Authorities must use the full 11 
+	character BIC code to identify the counterparties wherever possible.
+	If the counterparty is a regulated market, an MTF or a central counterparty 
+	and the reporting party does not know its counterparty, this field should be 
+	populated with the MIC code of the trading venue. When the counterparty is 
+	not an investment firm, a regulated market, an MTF or entity acting as a 
+	central counterparty, it should be identified with an internal code. 
+
+	TradingVenueCodeCompleteDescriptionType: Identification of the 
+	venue where the transaction was executed. It shall consist in:
+	- If the venue is a systematic internaliser, the ISO 9362 BIC 
+	code of the investment firm running the system.
+	- where the venue is a MTF or regulated market, the ISO 
+	  10383 MIC code.
+	- off market transactions should use the code 'XOFF'
+
+************************************************************************
+-->
+	<xs:complexType name="TradingTimeCompleteDescriptionType">
+		<xs:sequence>
+			<xs:element name="TradingTime" type="xs:time"/>
+			<xs:element name="TimeIdentifier" type="TipoIdentificadorHorario"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UnitPriceCompleteDescriptionType">
+		<xs:choice>
+			<xs:element name="PriceCurrency" type="TipoPrecio"/>
+			<xs:element name="PricePercentage" type="TipoPrecio"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="ClientIdCompleteDescriptionType">
+		<xs:sequence>
+			<xs:element name="ClientInformation" type="ClientInformationType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClientInformationType">
+		<xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="IndividualType" type="IndividualTypeType"/>
+				<xs:element name="LegalEntityType" type="LegalEntityTypeType"/>
+			</xs:choice>
+			<xs:element name="ClientQuantity" type="TipoCantidad"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IndividualTypeType">
+		<xs:sequence>
+			<xs:element name="IdentifierType" type="TipoIdClientePF"/>
+			<xs:element name="ClienteCode" type="TipoCodigoClienteoRepresentante"/>
+			<xs:element name="Name" type="TipoNombreoRazonSocial"/>
+			<xs:element name="Surname1" type="TipoApellido"/>
+			<xs:element name="Surname2" type="TipoApellido" minOccurs="0"/>
+			<xs:element name="LegalRepresentative" type="LegalRepresentativeType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LegalRepresentativeType">
+		<xs:sequence>
+			<xs:element name="TypeLegalRepresentative" type="TipoIdClientePF"/>
+			<xs:element name="IdLegalRepresentative" type="TipoCodigoClienteoRepresentante"/>
+			<xs:element name="NameLegalRepresentative" type="TipoNombreoRazonSocial"/>
+			<xs:element name="Surname1Representative" type="TipoApellido"/>
+			<xs:element name="Surname2Representative" type="TipoApellido" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LegalEntityTypeType">
+		<xs:sequence>
+			<xs:element name="IdentifierType" type="TipoIdClientePJ"/>
+			<xs:element name="ClienteCode" type="TipoCodigoClienteoRepresentante"/>
+			<xs:element name="FirmName" type="TipoNombreoRazonSocial"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CounterpartyCompleteDescriptionType">
+		<xs:choice>
+			<xs:element name="CounterpartyIdentificationBIC" type="TipoIdentificadorESI"/>
+			<xs:element name="CounterpartyIdentificationMIC" type="TipoMIC"/>
+			<xs:element name="CounterpartyIdentificationCustomer" type="TipoCodigoInterno"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="TradingVenueCodeCompleteDescriptionType">
+		<xs:choice>
+			<xs:element name="TradingVenueCodeBIC" type="TipoIdentificadorESI"/>
+			<xs:element name="TradingVenueCodeMIC" type="TipoMIC"/>
+			<xs:element name="TradingVenueCodeXOFF" type="TipoXOFF"/>
+		</xs:choice>
+	</xs:complexType>
+</xs:schema>

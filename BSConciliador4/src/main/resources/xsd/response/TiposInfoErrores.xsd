@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!--	
+************************************************************************************
+	TIPOS COMPUESTOS
+
+	TipoErrorFichero: se identifica el error relacionados con el fichero. 
+	
+	TipoErroresTransaccion: se identifican los errores relacionados con los datos
+	contenidos en la operación. Maximo ilimitado.
+
+	TipoErrorTransaccion: si se ha producido un error este viene determinado por 
+	su número de referencia y por el mensaje que especifica el tipo de error
+	que ha ocurrido.Asi como por el identificador de la operación en la que está
+	el error.
+	
+**************************************************************************************
+-->
+	<xs:complexType name="TipoErrorFichero">
+		<xs:sequence>
+			<xs:element name="ReferenciaErrorFichero" type="TipoReferenciaErrorFichero"/>
+			<xs:element name="MensajeErrorFichero" type="TipoMensajeError"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoErroresTransaccion">
+		<xs:sequence>
+			<xs:element name="ErrorTransaccion" type="TipoErrorTransaccion" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoErrorTransaccion">
+		<xs:sequence>
+			<!-- Los 4 primeros son los campos que identifican univocamente a una operación -->
+			<xs:element name="IdentificadorOperacion" type="TipoIdentificadorOperacion"/>
+			<xs:element name="SesionNegociacionOperacion" type="xs:date"/>
+			<xs:element name="IndicadorCompraVenta" type="TipoIndicadorCompraVenta"/>
+			<xs:element name="SistemaNegociacion" type="TipoSistemaNegociacion"/>
+			<xs:element name="ReferenciaErrorOperacion" type="TipoReferenciaErrorOperacion"/>
+			<xs:element name="MensajeErrorOperacion" type="TipoMensajeError"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FileErrorType">
+		<xs:sequence>
+			<xs:element name="ErrorFileReference" type="TipoReferenciaErrorFichero"/>
+			<xs:element name="ErrorFileMessage" type="TipoMensajeError"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TransactionErrorsCompleteDescriptionType">
+		<xs:sequence>
+			<xs:element name="OperationError" type="OperationErrorErrorType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OperationErrorErrorType">
+		<xs:sequence>
+			<!-- Los 4 primeros son los campos que identifican univocamente a una operación -->
+			<xs:element name="OperationID" type="TipoIdentificadorOperacion"/>
+			<xs:element name="OperationTradingDate" type="xs:date"/>
+			<xs:element name="BuySellIndicator" type="TipoIndicadorCompraVenta"/>
+			<xs:element name="TradingVenueCode" type="TipoSistemaNegociacionENG"/>
+			<xs:element name="ErrorTransactionReference" type="TipoReferenciaErrorOperacion"/>
+			<xs:element name="ErrorTransactionMessage" type="TipoMensajeError"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--	
+************************************************************************
+	TIPOS SIMPLES
+
+	TipoReferenciaErrorFichero: identifica el tipo de error que se ha 
+	producido. Formato: FICH-0[0-9][0-9].
+
+	TipoReferenciaErrorOperacion; identifica el tipo de error que se ha 
+	producido. Formato: 
+				TRAN-00[0-9] para errores de validacion
+				TRAN-01[0-9] para errores de incorporación
+	
+	TipoMensajeError: información textual sobre el error que se ha producido.
+	
+	TipoIdentificadorOperacion: facilitado por la empresa de inversión o 
+	un tercero que informa en su nombre - Formato: Max17(n)
+
+************************************************************************
+-->
+	<xs:simpleType name="TipoReferenciaErrorFichero">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="FICH-0[0-9][0-9]"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoReferenciaErrorOperacion">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="TRAN-0[0-9][0-9]"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoMensajeError">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoIdentificadorOperacion">
+		<xs:annotation>
+			<xs:documentation>Facilitado por la empresa de inversión o un tercero que informa en su nombre. - Formato: Max17(x)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="17"/>
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoIndicadorCompraVenta">
+		<xs:annotation>
+			<xs:documentation>
+			B: Buy  
+			S: Sell
+				</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="B|S"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TipoSistemaNegociacion">
+		<xs:choice>
+			<xs:element name="SistemaNegociacionBIC" type="TipoIdentificadorESI"/>
+			<xs:element name="SistemaNegociacionMIC" type="TipoMIC"/>
+			<xs:element name="SistemaNegociacionXOFF" type="TipoXOFF"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="TipoSistemaNegociacionENG">
+		<xs:choice>
+			<xs:element name="TradingVenueCodeBIC" type="TipoIdentificadorESI"/>
+			<xs:element name="TradingVenueCodeMIC" type="TipoMIC"/>
+			<xs:element name="TradingVenueCodeXOFF" type="TipoXOFF"/>
+		</xs:choice>
+	</xs:complexType>
+	<!-- Nuevo en version 2.4 -->
+	<xs:simpleType name="TipoIdentificadorESI">
+		<xs:annotation>
+			<xs:documentation>ISO 9362 - SWIFT/Bank Identifier Code (BIC). Formato: 11(x)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="([A-Z]){11}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoMIC">
+		<xs:annotation>
+			<xs:documentation> ISO 10383 MIC - Formato: 4(x) </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="[A-Z|0-9]{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- Nuevo en version 2.4 -->
+	<xs:simpleType name="TipoXOFF">
+		<xs:annotation>
+			<xs:documentation>XOFF: Off the Market o XXXX para MIC XOFF</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="XOFF|XXXX"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TramiteCNMV xsi:noNamespaceSchemaLocation="SINCO_Respuesta.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<DocumentoCNMV>
+		<CodigoTramite>CDT</CodigoTramite>
+		<Version>
+			<Datos>02.40</Datos>
+		</Version>
+	</DocumentoCNMV>
+	<TramiteCDT>
+		<TramiteCDT_RESESP FechaCreacion="2012-04-13" HoraCreacion="11:02:25">
+			<NombreFichero>AAAAAA_YYYYMMDD_RC_006.XML</NombreFichero>
+			<InfoErrores>
+				<ErroresOperacion>
+					<ErrorTransaccion>
+						<IdentificadorOperacion>2349876</IdentificadorOperacion>
+						<SesionNegociacionOperacion>2012-04-11</SesionNegociacionOperacion>
+						<IndicadorCompraVenta>B</IndicadorCompraVenta>
+						<SistemaNegociacion>
+							<SistemaNegociacionBIC>DSFADSFASDF</SistemaNegociacionBIC>
+						</SistemaNegociacion>
+						<ReferenciaErrorOperacion>TRAN-001</ReferenciaErrorOperacion>
+						<MensajeErrorOperacion>Ejemplo de mensaje para el error de transacciones.</MensajeErrorOperacion>
+					</ErrorTransaccion>
+				</ErroresOperacion>
+			</InfoErrores>
+		</TramiteCDT_RESESP>
+	</TramiteCDT>
+</TramiteCNMV>

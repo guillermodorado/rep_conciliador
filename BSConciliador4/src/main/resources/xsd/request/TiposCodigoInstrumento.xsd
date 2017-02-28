@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="TiposTransaccion.xsd"/>
+	<xs:complexType name="TipoCodigoInstrumento">
+		<xs:choice>
+			<xs:element name="TipoISIN" type="TipoCodigoInstrumentoISIN"/>
+			<xs:element name="TipoAII" type="TipoCodigoInstrumentoAII"/>
+			<xs:element name="TipoO" type="TipoCodigoInstrumentoO"/>
+		</xs:choice>
+	</xs:complexType>
+		<xs:complexType name="TipoCodigoInstrumentoENG">
+		<xs:choice>
+			<xs:element name="ISINType" type="TipoCodigoInstrumentoISIN"/>
+			<xs:element name="AIIType" type="TipoCodigoInstrumentoAII"/>
+			<xs:element name="OType" type="TipoCodigoInstrumentoO"/>
+		</xs:choice>
+	</xs:complexType>
+
+	<!-- 	   TIPO AII   -->
+	<xs:complexType name="TipoCodigoInstrumentoAII">
+		<xs:sequence>
+			<xs:element name="CodigoMercado" type="TipoMIC"/>
+			<xs:element name="CodigoContrato" type="TipoCodigoContrato"/>
+			<xs:element name="IdSubyacentes" type="TipoIdSubyacentes"/>
+			<xs:element name="TipoInstrumento" type="TipoTipoInstrumentoFO"/>
+			<xs:element name="MultiplicadorPrecio" type="TipoMultiplicadorPrecio" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TipoCodigoContrato">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:minLength value="1"/>
+			<xs:maxLength value="12"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoCodigoDescripcion">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:minLength value="1"/>
+			<xs:maxLength value="200"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TipoIdSubyacentes">
+		<xs:choice>
+			<xs:element name="TipoIdSubyacenteISIN" type="TipoTipoIdSubyacenteISIN"/>
+			<xs:element name="TipoIdSubyacenteO" type="TipoTipoIdSubyacenteO"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="TipoTipoIdSubyacenteISIN">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="[A-Z]{2}([A-Z]|[0-9]){9}[0-9]"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoTipoIdSubyacenteO">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:minLength value="1"/>
+			<xs:maxLength value="200"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TipoTipoInstrumentoFO">
+		<xs:sequence>
+			<xs:element name="FechaVencimiento" type="xs:date"/>
+			<xs:choice>
+				<xs:element name="TipoInstrumentoFOF" type="TipoTipoInstrumentoFOF"/>
+				<xs:element name="TipoInstrumentoFOO" type="TipoTipoInstrumentoFOO"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoTipoInstrumentoFOF">
+		<xs:sequence>
+			<xs:element name="IndicadorPutCall" type="TipoIndicadorPutCallF"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TipoIndicadorPutCallF">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="F"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TipoTipoInstrumentoFOO">
+		<xs:sequence>
+			<xs:element name="IndicadorPutCall" type="TipoIndicadorPutCallO"/>
+			<xs:element name="PrecioEjercicio" type="TipoPrecioEjercicio"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TipoIndicadorPutCallO">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="P|C"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoPrecioEjercicio">
+		<xs:union memberTypes="TipoPrecio TipoPrecio0"/>
+	</xs:simpleType>
+	<xs:simpleType name="TipoPrecio0">
+		<xs:restriction base="xs:integer">
+			<xs:pattern value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TipoMultiplicadorPrecio">
+		<xs:annotation>
+			<xs:documentation>Formato: Max 19(d) y max 2 cifras decimales. No admite negativos. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="19"/>
+			<xs:fractionDigits value="2"/>
+			<xs:minExclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--    		TIPO O  		 -->
+	<xs:complexType name="TipoCodigoInstrumentoO">
+		<xs:sequence>
+			<xs:element name="CodigoDescripcion" type="TipoCodigoDescripcion"/>
+			<xs:element name="IdSubyacentes" type="TipoIdSubyacentes"/>
+			<xs:element name="TipoInstrumento" type="TipoTipoInstrumento"/>
+			<xs:element name="MultiplicadorPrecio" type="TipoMultiplicadorPrecio" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoTipoInstrumento">
+		<xs:choice>
+			<xs:element name="TipoInstrumentoFO" type="TipoTipoInstrumentoFO"/>
+			<xs:element name="TipoInstrumentoCFD" type="TipoTipoInstrumentoCFD"/>
+			<xs:element name="TipoInstrumentoCDS" type="TipoInstrumentoCDSoES"/>
+			<xs:element name="TipoInstrumentoES" type="TipoInstrumentoCDSoES"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="TipoInstrumentoCDSoES">
+		<xs:sequence>
+			<xs:element name="FechaVencimiento" type="xs:date"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TipoTipoInstrumentoCFD">
+		<xs:sequence>
+			<xs:element name="FechaVencimiento" type="xs:date" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TipoTipodeInstrumento">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="CDS|ES"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

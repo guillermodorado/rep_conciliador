@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="TiposTransaccion.xsd"/>
+	<xs:include schemaLocation="TiposCodigoInstrumento.xsd"/>
+	<xs:element name="TramiteCNMV">
+		<xs:annotation>
+			<xs:documentation>La ESI envia transacciones para una fecha de negociación.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="DocumentoCNMV" type="TipoDocumentoCNMV"/>
+				<xs:element name="TramiteCDT" type="TipoTramiteCDTDual"/>
+			</xs:sequence>
+		</xs:complexType>
+		<!-- Restricciones de las operaciones -->
+		<xs:unique name="IdentificadorUnicoOperacion">
+			<xs:selector xpath="TramiteCDT/TramiteCDT_ESP/Operaciones/DatosOperacion"/>
+			<xs:field xpath="IdentificadorOperacion"/>
+			<xs:field xpath="SesionNegociacion"/>
+			<xs:field xpath="IndicadorCompraVenta"/>
+			<xs:field xpath="SistemaNegociacion/SistemaNegociacionMIC|SistemaNegociacion/SistemaNegociacionBIC|SistemaNegociacion/SistemaNegociacionXOFF"/>
+			<xs:field xpath="CodigoInstrumento/TipoISIN"/>
+		</xs:unique>
+		<xs:unique name="UniqueOperationID">
+			<xs:selector xpath="TramiteCDT/TramiteCDT_ENG/Operations/TransactionInfo"/>
+			<xs:field xpath="OperationID"/>
+			<xs:field xpath="TradingDay"/>
+			<xs:field xpath="BuySellIndicator"/>
+			<xs:field xpath="TradingVenueCode/TradingVenueCodeBIC|TradingVenueCode/TradingVenueCodeMIC|TradingVenueCode/TradingVenueCodeXOFF"/>
+		</xs:unique>
+		<!-- Restricciones de las cancelaciones-->
+		<xs:unique name="IdentificadorUnicoCancelacion">
+			<xs:selector xpath="TramiteCDT/TramiteCDT_ESP/Operaciones/DatosCancelacion"/>
+			<xs:field xpath="IdentificadorOperacion"/>
+			<xs:field xpath="SesionNegociacionOperacion"/>
+			<xs:field xpath="IndicadorCompraVenta"/>
+			<xs:field xpath="SistemaNegociacion/SistemaNegociacionMIC|SistemaNegociacion/SistemaNegociacionBIC|SistemaNegociacion/SistemaNegociacionXOFF"/>
+			<xs:field xpath="CodigoInstrumento"/>
+		</xs:unique>
+		<xs:unique name="UniqueCancellationID">
+			<xs:selector xpath="TramiteCDT/TramiteCDT_ENG/Operations/CancellationInfo"/>
+			<xs:field xpath="OperationID"/>
+			<xs:field xpath="TradingDay"/>
+			<xs:field xpath="BuySellIndicator"/>
+			<xs:field xpath="TradingVenueCode/TradingVenueCodeBIC|TradingVenueCode/TradingVenueCodeMIC|TradingVenueCode/TradingVenueCodeXOFF"/>
+			<xs:field xpath="InstrumentIdentification"/>
+		</xs:unique>
+	</xs:element>
+	<!--	
+******************************************************************************
+	CDT - INFORME SOBRE TRANSACCIONES
+
+	CorreoElectronico: al menos una dirección de correo electrónico 
+	de la ESI, si hay mas de una han de estar separadas por ";".
+
+	IdentificadorESI: Código BIC ISO 9362 - SWIFT/Bank Identifier 
+	Code (BIC).
+
+	DatosInformeTransaccion:información sobre las transacciones 
+	realizadas.
+
+    TipoDocumentoCNMV: se compone del codigo del trámite y 
+	de la versión del esquema utilizado.
+
+	Y dos atributos:	
+		FechaCreacion: del fichero xml.
+		HoraCreacion: del dichero xml.
+
+	El identificador de la transacción debe ser único en el fichero, por eso 
+	se ha declarado la restricción IdentificadorUnicoDeTransaccion.
+
+******************************************************************************
+-->
+	<xs:complexType name="TipoTramiteCDTDual">
+		<xs:choice>
+			<xs:element name="TramiteCDT_ESP" type="TipoTramiteCDT_ESP"/>
+			<xs:element name="TramiteCDT_ENG" type="TipoTramiteCDT_ENG"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="TipoTramiteCDT_ESP">
+		<xs:sequence>
+			<xs:element name="CorreoElectronico" type="TipoCorreoElectronico"/>
+			<xs:element name="TipoIdentificadorESI" type="TipoClaseIdentificadorESI"/>
+			<xs:element name="IdentificadorESI" type="TipoIdentificadorESI"/>
+			<xs:element name="Operaciones" type="TipoOperaciones"/>
+		</xs:sequence>
+		<xs:attribute name="FechaCreacion" type="xs:date" use="required"/>
+		<xs:attribute name="HoraCreacion" type="xs:time" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="TipoTramiteCDT_ENG">
+		<xs:sequence>
+			<xs:element name="eMail" type="TipoCorreoElectronico"/>
+			<xs:element name="FirmIdentificationType" type="TipoClaseIdentificadorESI"/>
+			<xs:element name="FirmIdentification" type="TipoIdentificadorESI"/>
+			<xs:element name="Operations" type="OperationsType"/>
+		</xs:sequence>
+
+	<xs:attribute name="CreationDate" type="xs:date" use="required"/> 			
+		<xs:attribute name="CreationTime" type="xs:time" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="TipoDocumentoCNMV">
+		<xs:sequence>
+			<xs:element name="CodigoTramite" type="TipoTramiteCNMV"/>
+			<xs:element name="Version" type="TipoVersion"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	
+	<!-- 
+*********************************************************************************
+OPERACIONES
+
+DatosOperacion: información relativa a la operación.
+DatosCancelacion: información relativa a la operación de cancelacion.
+
+	******************************************************************************
+-->
+	<xs:complexType name="TipoOperaciones">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="DatosOperacion" type="TipoDatosOperacion"/>
+			<xs:element name="DatosCancelacion" type="TipoDatosCancelacion"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="OperationsType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="TransactionInfo" type="TransactionReportingInfoType"/>
+			<xs:element name="CancellationInfo" type="CancellationReportingInfoType"/>
+		</xs:choice>
+	</xs:complexType>
+	<!-- 
+************************************************************************
+	TipoCorreoElectronico: se utiliza una expresión regular para 
+	validar la dirección o direcciones de los correos electrónicos 
+	que vienen en el XML, separados por ; 
+
+************************************************************************
+-->
+	<xs:simpleType name="TipoCorreoElectronico">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="([\.a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(([a-zA-Z0-9_-])*\.([a-zA-Z0-9_-])+)+([;]\s*([\.a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(([a-zA-Z0-9_-])*\.([a-zA-Z0-9_-])+)+)*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- 
+************************************************************************
+	TIPO DATOS INFORME DE OPERACIÓN
+
+	SesionNegociacion: fecha en la que se efectuó la transacción.
+    No puede ser menor a 1/11/2007.
+
+	HoraDeNegociacion: hora en la que se efectuó la transacción.
+
+	IndicadorCompraVenta: indica el tipo de transacción (compra o venta) desde la 
+	perspectiva de la ESI que presenta la información.
+
+	CapacidadNegociacion: indica si la ESI ha realizado la transacción por cuenta
+	propia o por cuenta y en nombre de un cliente.
+
+	CodigoInstrumento: podrá ser de tipo ISIN, AII (Alternative Instrument Identifier) u Otro.  
+
+	PrecioUnitario: por valor o contrato de derivados excluidos la comisión y 
+	el interés devengado. En el caso de deuda, el precio puede expresarse 
+	en moneda o en porcentaje.
+
+	Divisa: código de la divisa, según ISO 4217.
+
+	Cantidad: número de unidades negociadas del instrumento financiero, valor
+	nominal de las obligaciones o número de contratos de derivados incluidos en 
+	la transacción.
+
+    NotacionCantidad: Indicación de si la Cantidad se expresa en número de 
+    unidades negociadas del instrumento financiero, valor nominal de las 
+    obligaciones o el número de contratos de derivados incluidos en la transacción.
+
+	IdentificacionClientes: para los que se han ejecutado la transacción.
+
+	Contrapartida: identificación de la contrapartida.
+
+	SistemaNegociacion: emplazamiento en donde se ha realizado la transacción.
+
+	IdentificadorOperacion: identificación único para la operación 
+	facilitado por la ESI o por un tercero que informe en su nombre.
+
+************************************************************************
+-->
+	<xs:complexType name="TipoDatosOperacion">
+		<xs:sequence>
+			<xs:element name="SesionNegociacion" type="TipoSesionNeg"/>
+			<xs:element name="HoraDeNegociacion" type="TipoHoraDeNegociacion"/>
+			<xs:element name="IndicadorCompraVenta" type="TipoIndicadorCompraVenta"/>
+			<xs:element name="CapacidadNegociacion" type="TipoCapacidadNegociacion"/>
+			<xs:element name="CodigoInstrumento" type="TipoCodigoInstrumento"/>
+			<xs:element name="PrecioUnitario" type="TipoPrecioUnitario"/>
+			<xs:element name="Divisa" type="TipoDivisa"/>
+			<xs:element name="CantidadTotal" type="TipoCantidad"/>
+			<xs:element name="NotacionCantidad" type="TipoNotacionCantidad"/>
+			<xs:element name="IdentificacionClientes" type="TipoIdClientes"/>
+			<xs:element name="Contrapartida" type="TipoContrapartida"/>
+			<xs:element name="SistemaNegociacion" type="TipoSistemaNegociacion"/>
+			<xs:element name="IdentificadorOperacion" type="TipoIdentificadorOperacion"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- 
+************************************************************************
+	TIPO DATOS INFORME DE CANCELACION
+
+	IdentificadorOperacion: identificación único para la operación que  
+	facilitado por la ESI o por un tercero que informe en su nombre.
+
+	SesionNegociacionOperacion: fecha en la que se efectuó la transacción.
+    No puede ser menor a 1/11/2007.
+
+    IndicadorCompraVenta: indica el tipo de transacción (compra o venta) desde la 
+	perspectiva de la ESI que presenta la información.
+
+	SistemaNegociacion: emplazamiento en donde se ha realizado la transacción.
+
+	CodigoInstrumento: en el caso de que se envie una cancelacion de una operacion
+	con instrumento tipo ISIN, éste debe indicarse necesariamente 
+************************************************************************
+-->
+	<xs:complexType name="TipoDatosCancelacion">
+		<xs:sequence>
+			<xs:element name="IdentificadorOperacion" type="TipoIdentificadorOperacion"/>
+			<xs:element name="SesionNegociacionOperacion" type="TipoSesionNeg"/>
+			<xs:element name="IndicadorCompraVenta" type="TipoIndicadorCompraVenta"/>
+			<xs:element name="SistemaNegociacion" type="TipoSistemaNegociacion"/>
+			<xs:element name="CodigoInstrumento" type="TipoCodigoInstrumentoISIN" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- 
+************************************************************************
+OPERATION REPORTING INFO TYPE
+
+	TradingDay: Mandatory Field. ISO 8601 Extended Date Format 
+	(YYYY-MM-DD). Indicates the trading day on which the 
+	transaction was executed.
+
+	TradingTime: Mandatory Field. The time at which the 
+	transaction was executed.
+
+	BuySellIndicator: Mandatory Field. Identifies whether the 
+	transaction was a buy or sell from the perspective of the 
+	reporting investment firm or from the perspective of the client.
+
+	TradingCapacity: Mandatory Field. Identifies whether the firm 
+	executed the transaction on its own account (either on its 
+	own behalf or on behalf of a client) or for the account on 
+	behalf of a client.
+
+	InstrumentIdentification: Mandatory Code ISO 6166 ISIN. To be 
+	decided by the firm to which the report is made identifying the 
+	financial instrument which is the subject of the transaction, also 
+    AII or other type of identification.
+
+	UnitPrice: Mandatory Field. It express whether :
+	- The price in percentage or
+	- The unit price of a security or
+	- The price of one derivative contract in case of derivatives on 
+		securities
+
+	PriceNotation: Mandatory Field. ISO 4217 - Currency Code.	
+
+	Quantity: Mandatory Field. The number of units of the financial 
+	instrument, the nominal value of bonds, or the number of 
+	derivative contracts included in the transaction.
+
+    Quantity Notation: The number of units of the financial instruments, 
+	the nominal value of bonds, or the number of derivative contracts included
+    in the transaction.
+
+	ClientsIdentification: This element is optional. It can be one or more individuals 
+	or legal entities or both.
+
+	Counterparty: The complex structure of this element is being described 
+		in the TransactionTypes.xsd schema.
+
+	TradingVenueCode: Mandatory Field. The complex structure of this element is 
+		being described in the TransactionTypes.xsd schema.
+	
+	OperationID: Mandatory Field. A unique identification 
+		number for the operation provided by the investment firm 
+		or a third party reporting on its behalf.
+
+************************************************************************
+-->
+	<xs:complexType name="TransactionReportingInfoType">
+		<xs:sequence>
+			<xs:element name="TradingDay" type="xs:date"/>
+			<xs:element name="TradingTime" type="TradingTimeCompleteDescriptionType"/>
+			<xs:element name="BuySellIndicator" type="TipoIndicadorCompraVenta"/>
+			<xs:element name="TradingCapacity" type="TipoCapacidadNegociacion"/>
+			<xs:element name="InstrumentIdentification" type="TipoCodigoInstrumentoENG"/>
+			<xs:element name="UnitPrice" type="UnitPriceCompleteDescriptionType"/>
+			<xs:element name="PriceNotation" type="TipoDivisa"/>
+			<xs:element name="TotalQuantity" type="TipoCantidad"/>
+			<xs:element name="QuantityNotation" type="TipoNotacionCantidad"/>
+			<xs:element name="ClientsIdentification" type="ClientIdCompleteDescriptionType"/>
+			<xs:element name="Counterparty" type="CounterpartyCompleteDescriptionType"/>
+			<xs:element name="TradingVenueCode" type="TradingVenueCodeCompleteDescriptionType"/>
+			<xs:element name="OperationID" type="TipoIdentificadorOperacion"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- 
+
+
+************************************************************************
+CANCELLATION TYPE 
+
+	OperationID: Mandatory Field. A unique identification 
+    number for the original operation provided by the investment firm 
+	or a third party reporting on its behalf and now wants to be 
+	cancelled.
+
+   TradingDay: Mandatory Field. ISO 8601 Extended Date Format 
+	(YYYY-MM-DD). Indicates the trading day on which the 
+	original operation was executed.
+
+	BuySellIndicator: Mandatory Field. Identifies whether the 
+	original operation was a buy or sell from the perspective of the 
+	reporting investment firm or from the perspective of the client.
+
+	TradingVenueCode: Mandatory Field. The complex structure of this element is 
+		being described in the TransactionTypes.xsd schema.
+	
+    InstrumentIdentification: because it has been added to the constraint in the 
+	transactions.
+************************************************************************
+-->
+	<xs:complexType name="CancellationReportingInfoType">
+		<xs:sequence>
+			<xs:element name="OperationID" type="TipoIdentificadorOperacion"/>
+			<xs:element name="TradingDay" type="xs:date"/>
+			<xs:element name="BuySellIndicator" type="TipoIndicadorCompraVenta"/>
+			<xs:element name="TradingVenueCode" type="TradingVenueCodeCompleteDescriptionType"/>
+			<xs:element name="InstrumentIdentification" type="TipoCodigoInstrumentoISIN" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
